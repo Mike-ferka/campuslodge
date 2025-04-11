@@ -23,11 +23,11 @@ export function NavMenu() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem className="cursor-pointer flex gap-2 items-center" onClick={() =>router.push('/organization/new')}>
-          <Plus size={15}/> <span>Add Organization</span>
+        <DropdownMenuItem className="cursor-pointer flex gap-2 items-center" onClick={() =>router.push('/facility/new')}>
+          <Plus size={15}/> <span>Add facility</span>
         </DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer flex gap-2 items-center" onClick={() =>router.push('/my-facilities')}>
-        <Hotel size={15}/><span>My Facilities</span>
+        <DropdownMenuItem className="cursor-pointer flex gap-2 items-center" onClick={() =>router.push('/my-assets')}>
+        <Hotel size={15}/><span>My Assets</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer flex gap-2 items-center" onClick={() =>router.push('/my-bookings')}>
           <BookOpenCheck size={15}/><span>My Bookings</span>

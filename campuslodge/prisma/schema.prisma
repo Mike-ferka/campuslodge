@@ -1,98 +1,141 @@
-
 generator client {
-  provider = "prisma-client-js"
-    previewFeatures = ["fullTextSearch","fullTextIndex"]
-
+  provider        = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String    @unique
-  hotels        Hotel[]
-  bookings      Booking[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+model Facility {
+  id                    String     @id @default(uuid())
+  title                 String     @db.Text
+  userId String
+  description           String     
+  image                 String
+  country               String
+  state                 String
+  city                  String
+  locationDescription   String     
+
+  // Relations
+  equipment             Assets[]
+  bookings              Booking[]
+  category              Category[]
+  vehicle               Vehicles[]
+  auditorium            Auditorium[]
+  classroom             Classroom[]
+
+  addedAt               DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
 }
 
-model Hotel {
-  id                  String     @id @default(uuid())
-  title               String     @db.LongText
-  description         String     @db.LongText
+model Assets {
+  id                  String    @id @default(uuid())
+  title               String
+  description         String    
   image               String
-  country             String
-  state               String
-  city                String
-  locationDescription String     @db.LongText
-  gym                 Boolean    @default(false)
-  spa                 Boolean    @default(false)
-  bar                 Boolean    @default(false)
-  laundry            Boolean    @default(false)
-  restaurant         Boolean    @default(false)
-  shopping           Boolean    @default(false)
-  freeParking        Boolean    @default(false)
-  bikeRental         Boolean    @default(false)
-  swimmingPool       Boolean    @default(false)
-  coffeeShop         Boolean    @default(false)
-  rooms              Room[]
-  bookings           Booking[]
-  owner              User       @relation(fields: [ownerId], references: [id])
-  ownerId            String
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  assetCount          Int       @default(0)
+  maintainancePrice   Int       @default(0)
+  assetPrice          Int
+  category            Category[]
+  addedAt             DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
-  @@fulltext([title, description])
-}
+  // Relations
+  facilityId          String
+  Facility            Facility   @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  bookings            Booking[]
 
-model Room {
-  id               String    @id @default(uuid())
-  title            String
-  description      String
-  image            String
-  guestCount       Int       @default(1)
-  bathroomCount    Int       @default(1)
-  kingBed          Int       @default(0)
-  queenBed         Int       @default(0)
-  breakFastPrice   Int       @default(0)
-  roomPrice        Int
-  roomService      Boolean   @default(false)
-  tv               Boolean   @default(false)
-  balcony          Boolean   @default(false)
-  freeWifi         Boolean   @default(false)
-  cityView         Boolean   @default(false)
-  oceanView        Boolean   @default(false)
-  mountainView     Boolean   @default(false)
-  airConditioning  Boolean   @default(false)
-  soundProofed     Boolean   @default(false)
-  hotel            Hotel     @relation(fields: [hotelId], references: [id], onDelete: Cascade)
-  hotelId          String
-  bookings         Booking[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  @@index([facilityId])
 }
 
 model Booking {
-  id                 String    @id @default(uuid())
-  user               User      @relation(fields: [userId], references: [id])
-  userId             String
-  room               Room      @relation(fields: [roomId], references: [id])
-  roomId             String
-  hotel              Hotel     @relation(fields: [hotelId], references: [id])
-  hotelId            String
-  startDate          DateTime
-  endDate            DateTime
-  breakFastIncluded  Boolean   @default(false)
-  totalPrice         Int
-  paymentStatus      Boolean   @default(false)
-  paymentIntentId    String    @unique
-  createdAt          DateTime  @default(now())
+  id                     String    @id @default(uuid())
+  userName               String
+  addedAt                DateTime  @default(now())
+  startDate              DateTime
+  endDate                DateTime
+  currency               String
+  maintainancefeeIncluded Boolean  @default(false)
+  totalPrice             Int
+  paymentStatus          Boolean   @default(false)
+  paymentIntentId        String    @unique
+  bookedAt               DateTime  @default(now())
+  facilityOwnerId       String
 
-  @@index([hotelId])
-  @@index([roomId])
-  @@index([userId])
+  // Relations
+  facilityId             String
+  assetId                String
+  Facility               Facility  @relation(fields: [facilityId], references: [id])
+  Asset                  Assets    @relation(fields: [assetId], references: [id])
+
+  @@index([assetId])
+  @@index([facilityId])
+}
+
+model Category {
+  id          Int           @id @default(autoincrement())
+  vehicle     Vehicles[]
+  auditorium  Auditorium[]
+  classroom   Classroom[]
+  facilities  Facility[]
+  assets      Assets[]
+}
+
+model Classroom {
+  id                 Int    @id @default(autoincrement())
+  projector          Boolean @default(false)
+  whiteboard         Boolean @default(false)
+  microphone         Boolean @default(false)
+  wifi               Boolean @default(false)
+  aircondition       Boolean @default(false)
+  fan                Boolean @default(false)
+  deskandchairs      Boolean @default(false)
+  lectern            Boolean @default(false)
+  poweroutlets       Boolean @default(false)
+  lightingcontrol    Boolean @default(false)
+  computer           Boolean @default(false)
+
+  Facility Facility[]
+
+  Category Category[]
+}
+
+model Auditorium {
+  id                 Int    @id @default(autoincrement())
+  projector          Boolean @default(false)
+  stageLighting      Boolean @default(false)
+  speakers           Boolean @default(false)
+  liveStreamEquip    Boolean @default(false)
+  airCondition       Boolean @default(false)
+  fan                Boolean @default(false)
+  seats              Boolean @default(false)
+  lectern            Boolean @default(false)
+  backstageaccess    Boolean @default(false)
+  wheelchairacess    Boolean @default(false)
+  safety             Boolean @default(false)
+
+  Facility Facility[]
+
+  Category Category[]
+}
+
+model Vehicles {
+  id             Int    @id @default(autoincrement())
+  capacity       Int
+  ac             Boolean @default(false)
+  luggageStore   Boolean @default(false)
+  driver         Boolean @default(false)
+  firstAid       Boolean @default(false)
+  usbport        Boolean @default(false)
+  insurance      Boolean @default(false)
+  tracking       Boolean @default(false)
+  spareTyre      Boolean @default(false)
+
+  Facility Facility[]
+
+  Category Category[]
 }

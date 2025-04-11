@@ -13,6 +13,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 
 import "./globals.css";
 import NavBar from '@/components/layout/NavBar';
+import Container from '@/components/Container';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +49,10 @@ export default function RootLayout({
        <NavBar/>
       
         <section className='flex-grow'>
-        {children}
+          <Container>
+          {children}
+          </Container>
+       
         </section>
        </main>
        </ThemeProvider>
